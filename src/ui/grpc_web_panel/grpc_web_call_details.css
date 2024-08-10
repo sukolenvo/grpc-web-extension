@@ -1,0 +1,23 @@
+.pane {
+  background-color: var(--primary-color);
+  border-left: solid 1px var(--tertiary-color);
+}
+
+.pane-header {
+  background-color: var(--secondary-color);
+  border-bottom: solid 1px var(--tertiary-color);
+}
+
+button.active-button {
+  border-bottom: solid 2px var(--active-color);
+  color: var(--active-color)
+}
+
+.pane-header button {
+  padding: 0px 10px;
+  line-height: 1.33rem;
+}
+
+pre {
+  padding: 4px;
+}

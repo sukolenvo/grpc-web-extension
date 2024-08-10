@@ -1,0 +1,32 @@
+:root {
+  --primary-color: #fffbff;
+  --secondary-color: #f8f3fa;
+  --tertiary-color: #eedbff;
+  --active-color: #876aac;
+}
+
+body {
+  font-size: smaller;
+  color: #49454c;
+  letter-spacing: -0.5px;
+  background-color: var(--primary-color);
+}
+
+thead td {
+  background-color: var(--secondary-color);
+  border: solid 1px var(--tertiary-color);
+}
+
+tbody td {
+  border-right: solid 1px var(--tertiary-color);
+}
+
+table tr:nth-child(even) {
+  background-color: var(--secondary-color);
+}
+
+td {
+  font-size: smaller;
+  padding: 3px;
+}
+

@@ -40,6 +40,7 @@ export type GrpcWebCall = {
   id: string,
   url: string,
   status: GrpcStatus,
+  grpcMessage: string,
   duration_ms: number,
   size_bytes: number,
   request_frames: GrpcWebFrame[],

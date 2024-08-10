@@ -1,3 +1,8 @@
 .active-item {
   background-color: var(--tertiary-color);
 }
+
+.secondary-text {
+  color: #949299;
+  font-size: 12px;
+}

@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {GrpcWebCall} from "../../lib/grpc_call";
+import {GrpcWebCall} from "../../lib/grpc_web_call";
 import GrpcWebCallItem from "./grpc_web_call_item";
 import GrpcWebCallDetails from "./grpc_web_call_details";
 

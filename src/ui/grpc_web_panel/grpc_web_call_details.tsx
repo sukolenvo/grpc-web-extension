@@ -26,11 +26,9 @@ export default function GrpcWebCallDetails({call, onClose}: { call: GrpcWebCall,
 
 function GrpcWebFrameItem({frame}: {frame: GrpcWebFrame}) {
   return (
-    <div>
-      {frame.type == GrpcWebFrameType.TRAILER ? "Trailer: " : null}
-      <pre>
-        {frame.message.map(field => field.toString()).join("\n")}
-      </pre>
+    <div className="grpc-web-frame">
+      {frame.type == GrpcWebFrameType.TRAILER ? <h4>Trailer</h4> : null}
+      {frame.message.map((field, idx) => <pre key={idx}>{field.toString()}</pre>)}
     </div>
   )
 }

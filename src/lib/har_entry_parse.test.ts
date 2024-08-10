@@ -1,6 +1,6 @@
 import parseHarEntry from "./har_entry_parse";
+import {GrpcStatus, GrpcWebFrameType} from "./grpc_web_call";
 import HAREntry = chrome.devtools.network.HAREntry;
-import {GrpcStatus} from "./grpc_web_call";
 
 test('grpc message', () => {
   const grpcWebCall = parseHarEntry(grpcMessageHar, {
@@ -18,6 +18,22 @@ test('grpc message', () => {
     request_frames: [],
     response_frames: []
   })
+})
+
+test('trailer', () => {
+  const grpcWebCall = parseHarEntry(grpcMessageHar, {
+    content: "Z0FBQUFBOW5jbkJqTFhOMFlYUjFjem93RFFvPQ==",
+    encoding: "base64"
+  })
+
+  expect(grpcWebCall.response_frames).toEqual([{
+      type: GrpcWebFrameType.TRAILER,
+      message: [{
+        id: 0,
+        value: "grpc-status:0"
+      }]
+    }]
+  )
 })
 
 const grpcMessageHar = {

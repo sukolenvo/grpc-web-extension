@@ -27,6 +27,7 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --mode development -c webpack.dev.js",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "test": "jest"
   }
 }

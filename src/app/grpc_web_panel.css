@@ -6,7 +6,7 @@
 }
 
 body {
-  font-size: smaller;
+  font-size: 14px;
   color: #49454c;
   letter-spacing: -0.5px;
   background-color: var(--primary-color);

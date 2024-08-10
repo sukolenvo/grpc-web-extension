@@ -1,4 +1,4 @@
-import {GrpcWebCall, GrpcWebFrame, GrpcWebFrameType} from "../../lib/grpc_call";
+import {GrpcWebCall, GrpcWebFrame, GrpcWebFrameType} from "../../lib/grpc_web_call";
 import {useState} from "react";
 import clsx from "clsx";
 import './grpc_web_call_details.css'

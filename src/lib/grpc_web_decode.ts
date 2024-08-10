@@ -1,4 +1,4 @@
-import {GrpcField, GrpcMessage, GrpcWebFrame, GrpcWebFrameType} from "./grpc_call";
+import {GrpcField, GrpcMessage, GrpcWebFrame, GrpcWebFrameType} from "./grpc_web_call";
 
 enum GrpcWireType {
   VARINT = 0,
@@ -94,23 +94,32 @@ function decodeGrpc(message: Uint8Array): GrpcMessage {
 }
 
 export function decode(message: string): GrpcWebFrame[] {
-  const bytes = new Uint8Array(message.length / 4 * 3)
+  let padding = 0
+  for (let i = 0; i < message.length; i++) {
+    if (message[i] === '=') {
+      padding++
+    }
+  }
+  const bytes = new Uint8Array(message.length / 4 * 3 - padding)
+  let pos = 0
   for (let i = 0; i < message.length; i += 4) {
     const binaryString = atob(message.slice(i, i + 4))
     for (let j = 0; j < binaryString.length; j++) {
-      bytes[i / 4 * 3 + j] = binaryString.charCodeAt(j)
+      bytes[pos++] = binaryString.charCodeAt(j)
     }
   }
   const result = []
   for (let pos = 0; pos < bytes.length;) {
     const frameType = bytes[pos++] as GrpcWebFrameType
     let length = bytes[pos++] << 24 | bytes[pos++] << 16 | bytes[pos++] << 8 | bytes[pos++]
-    const message = new Uint8Array(length)
-    for (let i = 0; i < length; i++) {
-      message[i] = bytes[pos++]
+    if (length == 0) {
+      continue
     }
-    result.push({type: frameType, message: decodeGrpc(message)})
-    break
+    const payload = new Uint8Array(length)
+    for (let i = 0; i < length; i++) {
+      payload[i] = bytes[pos++]
+    }
+    result.push({type: frameType, message: decodeGrpc(payload)})
   }
   return result
 }

@@ -12,6 +12,10 @@ body {
   background-color: var(--primary-color);
 }
 
+h4 {
+  font-size: 1em;
+}
+
 thead td {
   background-color: var(--secondary-color);
   border: solid 1px var(--tertiary-color);

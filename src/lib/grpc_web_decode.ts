@@ -33,6 +33,7 @@ function tryDecodeString(bytes: Uint8Array): string | undefined {
 class VarintGrpcField {
   constructor(public id: number, public value: number) {
   }
+
   toString() {
     return this.id.toString() + ": " + this.value.toString()
   }
@@ -41,20 +42,31 @@ class VarintGrpcField {
 class StringGrpcField {
   constructor(public id: number, public value: string) {
   }
+
   toString() {
     return this.id.toString() + ": " + this.value
+  }
+}
+
+class TrailerGrpcField {
+  constructor(public id: number, public value: string) {
+  }
+
+  toString() {
+    return this.value
   }
 }
 
 class MessageGrpcField {
   constructor(public id: number, public value: GrpcMessage) {
   }
+
   toString() {
     return this.id.toString() + ": {\n  " + this.value.map(field => field.toString()).join("\n").replaceAll("\n", "\n  ") + "\n}"
   }
 }
 
-function decodeGrpc(message: Uint8Array): GrpcMessage {
+function decodeGrpc(message: Uint8Array): GrpcMessage | undefined {
   const result = [] as GrpcField[]
   for (let pos = 0; pos < message.length;) {
     const tag = message[pos++]
@@ -62,31 +74,38 @@ function decodeGrpc(message: Uint8Array): GrpcMessage {
     const wire_type = tag & 0x7
     if (wire_type == GrpcWireType.VARINT) {
       const [value, new_pos] = readVarint(message, pos)
+      if (new_pos > message.length) {
+        return undefined
+      }
       result.push(new VarintGrpcField(field_number, value))
       pos = new_pos
       continue
     } else if (wire_type == GrpcWireType.FIXED_64) {
-      result.push({id: field_number, value: "FIXED_64"})
+      result.push(new StringGrpcField(field_number, "FIXED_64"))
     } else if (wire_type == GrpcWireType.LENGTH_DELIMITED) {
       const [length, new_pos] = readVarint(message, pos)
+      if (new_pos > message.length) {
+        return undefined
+      }
       pos = new_pos
       let value = message.slice(pos, pos + length);
       const stringValue = tryDecodeString(value)
       if (stringValue === undefined) {
         result.push(new MessageGrpcField(field_number, decodeGrpc(value)))
       } else {
-        result.push(new StringGrpcField(field_number, stringValue))
+        result.push(new StringGrpcField(field_number, tryDecodeString(value)))
       }
       pos += length
       continue
     } else if (wire_type == GrpcWireType.START_GROUP) {
-      result.push({id: field_number, value: "START_GROUP"})
+      result.push(new StringGrpcField(field_number, "START_GROUP"))
     } else if (wire_type == GrpcWireType.END_GROUP) {
-      result.push({id: field_number, value: "END_GROUP"})
+      result.push(new StringGrpcField(field_number, "END_GROUP"))
     } else if (wire_type == GrpcWireType.FIXED_32) {
-      result.push({id: field_number, value: "FIXED_32"})
+      result.push(new StringGrpcField(field_number, "FIXED_32"))
     } else {
       console.log("Grpc decoding error at pos " + pos, message)
+      return undefined
     }
     break
   }
@@ -119,7 +138,13 @@ export function decode(message: string): GrpcWebFrame[] {
     for (let i = 0; i < length; i++) {
       payload[i] = bytes[pos++]
     }
-    result.push({type: frameType, message: decodeGrpc(payload)})
+    if (frameType === GrpcWebFrameType.DATA) {
+      result.push({type: frameType, message: decodeGrpc(payload)})
+    } else if (frameType === GrpcWebFrameType.TRAILER) {
+      result.push({type: frameType, message: [new TrailerGrpcField(0, tryDecodeString(payload)?.trim())]})
+    } else {
+      console.warn("Unexpected frame type " + frameType, message)
+    }
   }
   return result
 }

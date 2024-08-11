@@ -20,7 +20,7 @@ export enum GrpcStatus {
 
 export enum GrpcWebFrameType {
   DATA = 0,
-  TRAILER = 1,
+  TRAILER = 128,
 }
 
 export type GrpcField = {

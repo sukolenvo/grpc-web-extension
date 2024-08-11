@@ -18,6 +18,16 @@ button.active-button {
   line-height: 1.33rem;
 }
 
-pre {
+.grpc-web-frame {
   padding: 4px;
+  border-bottom: solid 1px var(--tertiary-color);
+}
+
+.grpc-web-frame:last-child {
+  padding: 4px;
+  border-bottom: none;
+}
+
+h4 {
+  font-weight: bolder;
 }

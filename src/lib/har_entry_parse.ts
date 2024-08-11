@@ -13,13 +13,13 @@ export const getHeader = (headers: Header[], header_name: string): string|undefi
 }
 
 function getResponseMessage(responseContent: ResponseContent): string {
-  if (responseContent.content === "") {
-    return responseContent.content
+  if (responseContent.content === "" || responseContent.content === undefined) {
+    return ""
   }
   if (responseContent.encoding == "base64") {
     return atob(responseContent.content)
   }
-  console.warn("Unexpected encoding ", responseContent)
+  console.warn("Unexpected encoding " + responseContent.encoding, responseContent.content)
   return ""
 }
 

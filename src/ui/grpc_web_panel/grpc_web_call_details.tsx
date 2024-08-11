@@ -19,13 +19,18 @@ export default function GrpcWebCallDetails({call, onClose}: { call: GrpcWebCall,
                                label="Response"/>
       </div>
       <div>
+        {frames.length === 0 &&
+            <p className="italic p-1" style={{color: '#948f99'}}>
+                Empty message
+            </p>
+        }
         {frames.map((frame, idx) => <GrpcWebFrameItem frame={frame} key={idx}/>)}
       </div>
     </div>
   );
 }
 
-function GrpcWebFrameItem({frame}: {frame: GrpcWebFrame}) {
+function GrpcWebFrameItem({frame}: { frame: GrpcWebFrame }) {
   return (
     <div className="grpc-web-frame">
       {frame.type == GrpcWebFrameType.TRAILER ? <h4>Trailer</h4> : null}

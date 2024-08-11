@@ -90,10 +90,24 @@ function decodeGrpc(message: Uint8Array): GrpcMessage | undefined {
       pos = new_pos
       let value = message.slice(pos, pos + length);
       const stringValue = tryDecodeString(value)
+      const messageValue = decodeGrpc(value);
       if (stringValue === undefined) {
-        result.push(new MessageGrpcField(field_number, decodeGrpc(value)))
+        result.push(new MessageGrpcField(field_number, messageValue))
+      } else if (messageValue === undefined) {
+        result.push(new StringGrpcField(field_number, stringValue))
       } else {
-        result.push(new StringGrpcField(field_number, tryDecodeString(value)))
+        let hasNonPrintable = false
+        for (let i = 0; i < stringValue.length; i++) {
+          if (stringValue.charCodeAt(i) < 9 || stringValue.charCodeAt(i) > 9 && stringValue.charCodeAt(i) < 13) {
+            hasNonPrintable = true
+            break
+          }
+        }
+        if (hasNonPrintable) {
+          result.push(new MessageGrpcField(field_number, messageValue))
+        } else {
+          result.push(new StringGrpcField(field_number, stringValue))
+        }
       }
       pos += length
       continue

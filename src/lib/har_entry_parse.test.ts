@@ -109,6 +109,24 @@ test('non-printable-2', () => {
   )
 })
 
+test('bytes', () => {
+  const grpcWebCall = parseHarEntry(grpcMessageHar, {
+    content: "QUFBQUFBY0tCZi8vLy8vLw==",
+    encoding: "base64"
+  })
+
+  expect(grpcWebCall.response_frames).toEqual([
+      {
+        type: GrpcWebFrameType.DATA,
+        message: [{
+          id: 1,
+          value: "ff ff ff ff ff",
+        }]
+      }
+    ]
+  )
+})
+
 describe('fixed64', () => {
   test('double', () => {
     const grpcWebCall = parseHarEntry(grpcMessageHar, {

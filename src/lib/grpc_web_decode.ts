@@ -101,7 +101,9 @@ function decodeGrpc(message: Uint8Array): GrpcMessage | undefined {
       let value = message.slice(pos, pos + length);
       const stringValue = tryDecodeString(value)
       const messageValue = decodeGrpc(value);
-      if (stringValue === undefined) {
+      if (stringValue === undefined && messageValue === undefined) {
+        result.push(new StringGrpcField(field_number, Array.from(value).map(it => it.toString(16).padStart(2, '0')).join(' ')))
+      } else if (stringValue === undefined) {
         result.push(new MessageGrpcField(field_number, messageValue))
       } else if (messageValue === undefined) {
         result.push(new StringGrpcField(field_number, stringValue))

@@ -33,7 +33,7 @@ function GrpcWebPanel({initialCalls}: { initialCalls: GrpcWebCall[] }) {
   const handleNewEntry = (entry: chrome.devtools.network.Request) => {
     if (getHeader(entry.request.headers, "content-type") == "application/grpc-web-text" || getHeader(entry.request.headers, "content-type") == "application/grpc") {
       entry.getContent((content, encoding) => {
-        setGrpcWebCalls([...grpcWebCalls, {
+        setGrpcWebCalls((prevState) => [...prevState, {
           ...parseHarEntry(entry, {content, encoding}),
           id: grpcWebCalls.length.toString()
         }])

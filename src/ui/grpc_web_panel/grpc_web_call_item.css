@@ -1,5 +1,5 @@
 .active-item {
-  background-color: var(--tertiary-color);
+  background-color: var(--tertiary-color) !important;
 }
 
 .secondary-text {

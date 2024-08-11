@@ -2,6 +2,7 @@ import {GrpcWebCall, GrpcWebFrame, GrpcWebFrameType} from "../../lib/grpc_web_ca
 import {useState} from "react";
 import clsx from "clsx";
 import './grpc_web_call_details.css'
+import {Close} from "@mui/icons-material";
 
 type ActiveTab = "request" | "response"
 
@@ -11,7 +12,7 @@ export default function GrpcWebCallDetails({call, onClose}: { call: GrpcWebCall,
   return (
     <div className="absolute top-0 right-0 w-1/2 h-screen overflow-scroll pane">
       <div className="pane-header">
-        <button onClick={onClose} className="p-1">X</button>
+        <button onClick={onClose} className="p-1"><Close className="p-1"/></button>
         <GrpcWebCallDetailsTab onClick={() => setSelectedTab("request")} selected={selectedTab === "request"}
                                label="Request"/>
         <GrpcWebCallDetailsTab onClick={() => setSelectedTab("response")} selected={selectedTab === "response"}

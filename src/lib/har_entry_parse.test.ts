@@ -109,6 +109,82 @@ test('non-printable-2', () => {
   )
 })
 
+describe('fixed64', () => {
+  test('double', () => {
+    const grpcWebCall = parseHarEntry(grpcMessageHar, {
+      content: "QUFBQUFBa0pya2ZoZWhTdTh6OD0=",
+      encoding: "base64"
+    })
+
+    expect(grpcWebCall.response_frames).toEqual([
+        {
+          type: GrpcWebFrameType.DATA,
+          message: [{
+            id: 1,
+            value: "1.23",
+          }]
+        }
+      ]
+    )
+  })
+
+  test('integer', () => {
+    const grpcWebCall = parseHarEntry(grpcMessageHar, {
+      content: "QUFBQUFBa0o2QU1BQUFBQUFBQT0=",
+      encoding: "base64"
+    })
+
+    expect(grpcWebCall.response_frames).toEqual([
+        {
+          type: GrpcWebFrameType.DATA,
+          message: [{
+            id: 1,
+            value: "1000",
+          }]
+        }
+      ]
+    )
+  })
+})
+
+describe("fixed32", () => {
+  it('float', () => {
+    const grpcWebCall = parseHarEntry(grpcMessageHar, {
+      content: "QUFBQUFBVU5wSENkUHc9PQ==",
+      encoding: "base64"
+    })
+
+    expect(grpcWebCall.response_frames).toEqual([
+        {
+          type: GrpcWebFrameType.DATA,
+          message: [{
+            id: 1,
+            value: "1.2300000190734863",
+          }]
+        }
+      ]
+    )
+  })
+
+  it('integer', () => {
+    const grpcWebCall = parseHarEntry(grpcMessageHar, {
+      content: "QUFBQUFBVU42QU1BQUE9PQ==",
+      encoding: "base64"
+    })
+
+    expect(grpcWebCall.response_frames).toEqual([
+        {
+          type: GrpcWebFrameType.DATA,
+          message: [{
+            id: 1,
+            value: "1000",
+          }]
+        }
+      ]
+    )
+  })
+})
+
 const grpcMessageHar = {
   "cache": {},
   "connection": "29742",

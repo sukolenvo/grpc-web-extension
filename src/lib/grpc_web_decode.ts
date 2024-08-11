@@ -79,9 +79,19 @@ function decodeGrpc(message: Uint8Array): GrpcMessage | undefined {
       }
       result.push(new VarintGrpcField(field_number, value))
       pos = new_pos
-      continue
     } else if (wire_type == GrpcWireType.FIXED_64) {
-      result.push(new StringGrpcField(field_number, "FIXED_64"))
+      if (pos + 8 > message.length) {
+        return undefined
+      }
+      const value = new DataView(message.buffer, pos, 8);
+      const doubleValue = value.getFloat64(0, true);
+      const bigIntValue = value.getBigInt64(0, true);
+      if (Math.abs(doubleValue) > 1e20 || Math.abs(doubleValue) < 1e-20) {
+        result.push(new StringGrpcField(field_number, bigIntValue.toString()))
+      } else {
+        result.push(new StringGrpcField(field_number, doubleValue.toString()))
+      }
+      pos += 8
     } else if (wire_type == GrpcWireType.LENGTH_DELIMITED) {
       const [length, new_pos] = readVarint(message, pos)
       if (new_pos > message.length) {
@@ -110,18 +120,27 @@ function decodeGrpc(message: Uint8Array): GrpcMessage | undefined {
         }
       }
       pos += length
-      continue
     } else if (wire_type == GrpcWireType.START_GROUP) {
       result.push(new StringGrpcField(field_number, "START_GROUP"))
     } else if (wire_type == GrpcWireType.END_GROUP) {
       result.push(new StringGrpcField(field_number, "END_GROUP"))
     } else if (wire_type == GrpcWireType.FIXED_32) {
-      result.push(new StringGrpcField(field_number, "FIXED_32"))
+      if (pos + 4 > message.length) {
+        return undefined
+      }
+      const value = new DataView(message.buffer, pos, 4);
+      const floatValue = value.getFloat32(0, true);
+      const intValue = value.getInt32(0, true);
+      if (Math.abs(floatValue) > 1e20 || Math.abs(floatValue) < 1e-20) {
+        result.push(new StringGrpcField(field_number, intValue.toString()))
+      } else {
+        result.push(new StringGrpcField(field_number, floatValue.toString()))
+      }
+      pos += 4
     } else {
       console.log("Grpc decoding error at pos " + pos, message)
       return undefined
     }
-    break
   }
   return result
 }

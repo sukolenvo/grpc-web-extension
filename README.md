@@ -18,3 +18,9 @@ Output is similar to (but not exactly matches) https://github.com/protocolbuffer
 1. Place `sample.har.json` into `src/app`
 2. Run `npm run dev` to start development server
 3. Open http://localhost:8080/grpc_web_panel.html
+
+### Credits
+
+* gRPC decoder online: https://protobuf-decoder.netlify.app/
+* gRPC wire format spec: https://protobuf.dev/programming-guides/encoding/
+* gRPC web frame format: https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-WEB.md#protocol-differences-vs-grpc-over-http2

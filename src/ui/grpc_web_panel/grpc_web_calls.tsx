@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {GrpcWebCall} from "../../lib/grpc_web_call";
 import GrpcWebPanelToolbox from "./toolbox";
 import GrpcWebCallItem from "./grpc_web_call_item";
@@ -6,20 +6,46 @@ import GrpcWebCallDetails from "./grpc_web_call_details";
 import './grpc_web_calls.css'
 
 export default function GrpcWebCalls({calls, onClearHistory}: { calls: GrpcWebCall[], onClearHistory: () => void }) {
+  const scrollContainerRef = useRef(undefined)
+  const scrollToBottom = useRef(true)
+  const ignoreScrollTill = useRef(Date.now())
   const [selectedCall, setSelectedCall] = useState(undefined)
+
   const handleOnItemSelected = (call: GrpcWebCall) => {
     setSelectedCall(call)
   }
   const handleOnClearHistory = () => {
     onClearHistory()
     setSelectedCall(undefined)
+    scrollToBottom.current = true
   }
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const handleScroll = () => {
+        if (ignoreScrollTill.current < Date.now()) {
+          scrollToBottom.current = (container.scrollTop + container.clientHeight) / container.scrollHeight > 0.99;
+        }
+      };
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [scrollContainerRef.current === undefined]);
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (container && selectedCall === undefined) {
+      if (scrollToBottom.current) {
+        ignoreScrollTill.current = Date.now() + 200
+        container.scrollTo(0, container.scrollHeight)
+      }
+    }
+  }, [calls])
   return (
     <main className="flex h-screen flex-col">
       <GrpcWebPanelToolbox onClearHistory={handleOnClearHistory}/>
       {calls.length === 0 && <RecordingRequestsEmptyView/>}
       {calls.length > 0 &&
-          <div className="overflow-y-scroll flex-grow">
+          <div className="overflow-y-scroll flex-grow scroll-smooth" ref={scrollContainerRef}>
               <table className="w-full ">
                   <thead>
                   <tr>

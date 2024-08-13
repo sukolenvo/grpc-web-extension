@@ -1,4 +1,6 @@
 import {GrpcField, GrpcMessage, GrpcWebFrame, GrpcWebFrameType} from "./grpc_web_call";
+import HAREntry = chrome.devtools.network.HAREntry;
+import DebtoolsRequest = chrome.devtools.network.Request;
 
 enum GrpcWireType {
   VARINT = 0,
@@ -145,6 +147,52 @@ function decodeGrpc(message: Uint8Array): GrpcMessage | undefined {
     }
   }
   return result
+}
+
+export function decodeEntryRequest(entry: HAREntry): Promise<GrpcWebFrame[]> {
+  return new Promise(resolve => {
+    resolve(decode(entry.request.postData?.text || ""))
+  })
+}
+
+type ResponseContent = {
+  content: string,
+  encoding: string | undefined,
+}
+
+function getResponseMessage(responseContent: ResponseContent): string {
+  if (responseContent.content === "" || responseContent.content === undefined) {
+    return ""
+  }
+  if (responseContent.encoding == "base64") {
+    return atob(responseContent.content)
+  }
+  throw "Unexpected encoding " + responseContent.encoding
+}
+
+export function decodeEntryResponse(entry: HAREntry): Promise<GrpcWebFrame[]> {
+  return new Promise<ResponseContent>((resolve, reject) => {
+    if (entry.response.content.text !== undefined && entry.response.content.text !== "") {
+      resolve({
+        content: entry.response.content.text,
+        encoding: entry.response.content.encoding,
+      })
+    } else if ('getContent' in entry) {
+      (entry as DebtoolsRequest).getContent((content: string, encoding: string) => {
+        resolve({
+          content: content,
+          encoding: encoding,
+        })
+      })
+    } else {
+      console.error("Failed to load response frames", entry)
+      reject("No content")
+    }
+  })
+    .then(response => {
+      return getResponseMessage(response)
+    })
+    .then(message => decode(message))
 }
 
 export function decode(message: string): GrpcWebFrame[] {

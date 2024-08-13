@@ -1,3 +1,5 @@
+import HAREntry = chrome.devtools.network.HAREntry;
+
 export enum GrpcStatus {
   OK = "0",
   CANCELLED = "1",
@@ -43,6 +45,5 @@ export type GrpcWebCall = {
   grpcMessage: string,
   duration_ms: number,
   size_bytes: number,
-  request_frames: GrpcWebFrame[],
-  response_frames: GrpcWebFrame[],
+  entry: HAREntry,
 }

@@ -6,3 +6,7 @@
   color: #949299;
   font-size: 12px;
 }
+
+.grpc-call-item td:focus-visible {
+  outline: none;
+}

@@ -1,3 +1,23 @@
 .grpc-web-panel-toolbox {
   border-bottom: 1px solid var(--tertiary-color);
+  display: flex;
+  align-items: center;
+}
+
+.grpc-web-panel-toolbox input {
+  background-color: #e1dae1;
+  border-radius: 10px;
+  padding-left: 10px;
+  margin: 3px;
+  width: 150px;
+  font-size: small;
+}
+
+.grpc-web-panel-toolbox input:hover {
+  background-color: #d5d3d5;
+}
+
+.grpc-web-panel-toolbox input:focus {
+  background-color: #d5d3d5;
+  outline: 2px solid var(--active-color);
 }

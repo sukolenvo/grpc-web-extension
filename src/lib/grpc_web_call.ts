@@ -20,6 +20,11 @@ export enum GrpcStatus {
   UNAUTHENTICATED = "16",
 }
 
+export function getGrpcStatusName(grpcStatus: GrpcStatus): string {
+  return Object.keys(GrpcStatus).find(it => GrpcStatus[it] === grpcStatus)
+}
+
+
 export enum GrpcWebFrameType {
   DATA = 0,
   TRAILER = 128,

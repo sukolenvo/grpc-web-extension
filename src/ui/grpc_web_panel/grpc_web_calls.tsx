@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState} from "react";
-import {GrpcWebCall} from "../../lib/grpc_web_call";
+import React, {ChangeEvent, useEffect, useRef, useState} from "react";
+import {getGrpcStatusName, GrpcWebCall} from "../../lib/grpc_web_call";
 import GrpcWebPanelToolbox from "./toolbox";
 import GrpcWebCallItem from "./grpc_web_call_item";
 import GrpcWebCallDetails from "./grpc_web_call_details";
@@ -10,6 +10,7 @@ export default function GrpcWebCalls({calls, onClearHistory}: { calls: GrpcWebCa
   const scrollToBottom = useRef(true)
   const ignoreScrollTill = useRef(Date.now())
   const [selectedCall, setSelectedCall] = useState(undefined)
+  const [filter, setFilter] = useState(undefined)
 
   const handleOnItemSelected = (call: GrpcWebCall) => {
     setSelectedCall(call)
@@ -40,13 +41,32 @@ export default function GrpcWebCalls({calls, onClearHistory}: { calls: GrpcWebCa
       }
     }
   }, [calls])
+  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFilter(e.target.value)
+  }
+  const handleKeyDown = (e) => {
+    console.log(e)
+    if (e.key == 'ArrowDown' && selectedCall) {
+      const index = calls.indexOf(selectedCall)
+      if (index < calls.length - 1) {
+        setSelectedCall(calls[index + 1])
+        e.preventDefault()
+      }
+    } else if (e.key == 'ArrowUp' && selectedCall) {
+      const index = calls.indexOf(selectedCall)
+      if (index > 0) {
+        setSelectedCall(calls[index - 1])
+        e.preventDefault()
+      }
+    }
+  }
   return (
     <main className="flex h-screen flex-col">
-      <GrpcWebPanelToolbox onClearHistory={handleOnClearHistory}/>
+      <GrpcWebPanelToolbox onClearHistory={handleOnClearHistory} onFilterChange={handleFilterChange}/>
       {calls.length === 0 && <RecordingRequestsEmptyView/>}
       {calls.length > 0 &&
           <div className="overflow-y-scroll flex-grow scroll-smooth" ref={scrollContainerRef}>
-              <table className="w-full ">
+              <table className="w-full" onKeyDown={handleKeyDown}>
                   <thead>
                   <tr>
                       <td>
@@ -64,8 +84,12 @@ export default function GrpcWebCalls({calls, onClearHistory}: { calls: GrpcWebCa
                   </tr>
                   </thead>
                   <tbody>
-                  {calls.map(call => <GrpcWebCallItem key={call.id} call={call} onClick={() => handleOnItemSelected(call)}
-                                                      active={call === selectedCall}/>)}
+                  {calls
+                    .filter(call => filter === undefined || call.url.toLowerCase().includes(filter.toLowerCase())
+                      || call.grpcMessage.toLowerCase().includes(filter.toLowerCase())
+                      || getGrpcStatusName(call.status).toLowerCase().includes(filter.toLowerCase()))
+                    .map(call => <GrpcWebCallItem key={call.id} call={call} onClick={() => handleOnItemSelected(call)}
+                                                  active={call === selectedCall}/>)}
                   </tbody>
               </table>
             {selectedCall && <GrpcWebCallDetails call={selectedCall} onClose={() => setSelectedCall(undefined)}/>}

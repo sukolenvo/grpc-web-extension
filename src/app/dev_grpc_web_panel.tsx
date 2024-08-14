@@ -11,12 +11,8 @@ const harLog = require('./sample.har.json').log as HARLog
 
 let initialCalls = harLog.entries
   .filter(entry => getHeader(entry.request.headers, "content-type") == "application/grpc-web-text" || getHeader(entry.request.headers, "content-type") == "application/grpc")
-  .map((entry, idx) => {
-    const grpcWebCall = toGrpcWebCall(entry);
-    return {
-      ...grpcWebCall,
-      id: idx.toString(),
-    }
+  .map((entry) => {
+    return toGrpcWebCall(entry)
   })
 
 const root = createRoot(document.getElementById('root'));

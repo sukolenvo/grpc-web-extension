@@ -3,24 +3,29 @@ import {useEffect, useState} from "react";
 import clsx from "clsx";
 import './grpc_web_call_details.css'
 import {Close} from "@mui/icons-material";
-import {decodeEntryRequest, decodeEntryResponse} from "../../lib/grpc_web_decode";
+import {decodeEntryRequest, decodeEntryResponse, decodeEntryStatusDetails} from "../../lib/grpc_web_decode";
+import {getHeader} from "../../lib/har_entry_parse";
 
-type ActiveTab = "request" | "response"
+type ActiveTab = "request" | "response" | "status-details"
 
 export default function GrpcWebCallDetails({call, onClose}: { call: GrpcWebCall, onClose: () => void }) {
   const [selectedTab, setSelectedTab] = useState("request" as ActiveTab)
   const [grpcFrames, setGrpcFrames] = useState([])
   useEffect(() => {
     let cancelled = false
-    const promise = selectedTab === "request" ? decodeEntryRequest(call.entry) : decodeEntryResponse(call.entry)
-      promise.then(frames => {
+    const promise = selectedTab === "request" ? decodeEntryRequest(call.entry) :
+      selectedTab === "response" ? decodeEntryResponse(call.entry) : decodeEntryStatusDetails(call.entry)
+    promise.then(frames => {
+      if (!cancelled) {
+        setGrpcFrames(frames)
+      }
+    })
+      .catch(e => {
+        console.log("failed to decode grpc frames", call, e)
         if (!cancelled) {
-          setGrpcFrames(frames)
+          setGrpcFrames([])
         }
       })
-        .catch(e => {
-          console.log("failed to decode grpc frames", call, e)
-        })
     return () => {
       cancelled = true
     }
@@ -33,6 +38,11 @@ export default function GrpcWebCallDetails({call, onClose}: { call: GrpcWebCall,
                                label="Request"/>
         <GrpcWebCallDetailsTab onClick={() => setSelectedTab("response")} selected={selectedTab === "response"}
                                label="Response"/>
+        {getHeader(call.entry.response.headers, "grpc-status-details-bin") &&
+            <GrpcWebCallDetailsTab onClick={() => setSelectedTab("status-details")}
+                                   selected={selectedTab === "status-details"}
+                                   label="Status"/>
+        }
       </div>
       <div>
         {grpcFrames.length === 0 &&

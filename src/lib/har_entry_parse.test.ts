@@ -6,7 +6,7 @@ test('HAR entry to grpc web call', () => {
   const grpcWebCall = toGrpcWebCall(grpcMessageHar)
 
   expect(grpcWebCall).toEqual({
-    id: "",
+    id: expect.stringMatching(/\d+/),
     url: "https://localhost.test/proto.UserService/WhoAmI",
     status: GrpcStatus.UNAUTHENTICATED,
     grpcMessage: "Unauthenticated request",

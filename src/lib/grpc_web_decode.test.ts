@@ -1,5 +1,6 @@
 import {GrpcWebFrameType} from "./grpc_web_call";
-import {decode} from "./grpc_web_decode";
+import {decode, decodeEntryStatusDetails} from "./grpc_web_decode";
+import HAREntry = chrome.devtools.network.HAREntry;
 
 
 test('trailer', () => {
@@ -166,4 +167,33 @@ test("multiple frames with padding", () => {
   const grpcWebCall = decode("AAAAAAcKBf//////AAAAAAUNpHCdPw==AAAAAAkJ6AMAAAAAAAA=")
 
   expect(grpcWebCall).toHaveLength(3)
+})
+
+test("grpc-status-details-bin", async () => {
+  const result = await decodeEntryStatusDetails({
+    response: {
+      headers: [{
+        name: "grpc-status-details-bin",
+        value: "CAkahQEKZXR5cGUuZ29vZ2xlYXBpcy5jb20veHh4eHh4eHgueHh4eHh4eC54eHh4eHh4eHh4eHh4eHgudjQueHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHhQcmVjb25kaXRpb25GYWlsdXJlEhwKGkV4cGVjdGVkIGV4YWN0bHkgb25lIHNoZWV0"
+      }]
+    }
+  } as HAREntry)
+  expect(result).toEqual([{
+    type: GrpcWebFrameType.DATA,
+    message: [
+      {
+        id: 1,
+        value: "type.googleapis.com/xxxxxxxx.xxxxxxx.xxxxxxxxxxxxxxx.v4.xxxxxxxxxxxxxxxxxxxxxxxxxxPreconditionFailure",
+      },
+      {
+        id: 2,
+        value: [
+          {
+            id: 1,
+            value: "Expected exactly one sheet"
+          }
+        ]
+      }
+    ]
+  }])
 })

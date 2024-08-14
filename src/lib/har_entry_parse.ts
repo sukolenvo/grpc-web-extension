@@ -6,9 +6,11 @@ export const getHeader = (headers: Header[], header_name: string): string|undefi
   return headers.find(header => header.name.toLowerCase() === header_name)?.value
 }
 
+let nextId = 1
+
 export default function toGrpcWebCall(entry: HAREntry): GrpcWebCall {
   return {
-    id: "",
+    id: (nextId++).toString(),
     url: entry.request.url,
     status: getHeader(entry.response.headers, "grpc-status") as GrpcStatus || GrpcStatus.OK,
     grpcMessage: getHeader(entry.response.headers, "grpc-message") || "",

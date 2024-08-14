@@ -155,6 +155,24 @@ export function decodeEntryRequest(entry: HAREntry): Promise<GrpcWebFrame[]> {
   })
 }
 
+export function decodeEntryStatusDetails(entry: HAREntry): Promise<GrpcWebFrame[]> {
+  return new Promise((resolve, reject) => {
+    const value = entry.response.headers.find(header => header.name.toLowerCase() === "grpc-status-details-bin")?.value || "";
+    const decodedString = atob(value)
+    const bytes = new Uint8Array(decodedString.length)
+    for (let i = 0; i < decodedString.length; i++) {
+      bytes[i] = decodedString.charCodeAt(i)
+    }
+    const grpcStatus = decodeGrpc(bytes);
+    const statusDetails = grpcStatus.find(it => it.id === 3);
+    if (statusDetails === undefined) {
+      reject("status doesn't include details")
+    } else {
+      resolve([{type: GrpcWebFrameType.DATA, message: statusDetails.value as GrpcMessage}])
+    }
+  })
+}
+
 type ResponseContent = {
   content: string,
   encoding: string | undefined,

@@ -11,7 +11,8 @@ test('HAR entry to grpc web call', () => {
     status: GrpcStatus.UNAUTHENTICATED,
     grpcMessage: "Unauthenticated request",
     duration_ms: 318.63200000043435,
-    size_bytes: 0,
+    request_size: 8,
+    response_size: 0,
     entry: grpcMessageHar,
   })
 })

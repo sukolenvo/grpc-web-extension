@@ -49,6 +49,7 @@ export type GrpcWebCall = {
   status: GrpcStatus,
   grpcMessage: string,
   duration_ms: number,
-  size_bytes: number,
+  response_size: number,
+  request_size: number,
   entry: HAREntry,
 }

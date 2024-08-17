@@ -10,3 +10,7 @@
 .grpc-call-item td:focus-visible {
   outline: none;
 }
+
+.grpc-call-item svg {
+  color: #6d6872;
+}

@@ -10,7 +10,7 @@ type ActiveTab = "request" | "response" | "status-details"
 
 export default function GrpcWebCallDetails({call, onClose}: { call: GrpcWebCall, onClose: () => void }) {
   const [selectedTab, setSelectedTab] = useState("request" as ActiveTab)
-  const [grpcFrames, setGrpcFrames] = useState([])
+  const [grpcFrames, setGrpcFrames] = useState([] as GrpcWebFrame[])
   useEffect(() => {
     let cancelled = false
     const promise = selectedTab === "request" ? decodeEntryRequest(call.entry) :
@@ -60,7 +60,8 @@ function GrpcWebFrameItem({frame}: { frame: GrpcWebFrame }) {
   return (
     <div className="grpc-web-frame">
       {frame.type == GrpcWebFrameType.TRAILER ? <h4>Trailer</h4> : null}
-      {frame.message.map((field, idx) => <pre key={idx}>{field.toString()}</pre>)}
+      {frame.message === undefined && <i>failed to decode message</i>}
+      {frame.message?.map((field, idx) => <pre key={idx}>{field.toString()}</pre>)}
     </div>
   )
 }

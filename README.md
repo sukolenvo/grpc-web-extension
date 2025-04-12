@@ -15,7 +15,7 @@ Output is similar to (but not exactly matches) https://github.com/protocolbuffer
 
 ### Development
 
-1. Place `sample.har.json` into `src/app`
+1. Place `sample.har.json` into `src/ui/grpc_web_panel`
 2. Run `npm run dev` to start development server
 3. Open http://localhost:8080/grpc_web_panel.html
 

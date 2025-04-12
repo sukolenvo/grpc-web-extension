@@ -71,7 +71,8 @@ class MessageGrpcField {
 function decodeGrpc(message: Uint8Array): GrpcMessage | undefined {
   const result = [] as GrpcField[]
   for (let pos = 0; pos < message.length;) {
-    const tag = message[pos++]
+    const [tag, new_pos] = readVarint(message, pos);
+    pos = new_pos;
     const field_number = tag >> 3
     const wire_type = tag & 0x7
     if (wire_type == GrpcWireType.VARINT) {

@@ -8,10 +8,7 @@ Output is similar to (but not exactly matches) https://github.com/protocolbuffer
 
 ### Install
 
-1. Build extension: `npm ci && npm run build`
-2. Open `chrome://extensions/` in Chrome
-3. Enable "Developer mode"
-4. Click "Load unpacked" and select `dist` directory
+[Chrome Web Store](https://chromewebstore.google.com/detail/grpc-web-viewer/cgbejolghdmkegkcepgednicdmojnnch)
 
 ### Development
 

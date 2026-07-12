@@ -214,7 +214,20 @@ export function decodeEntryResponse(entry: HAREntry): Promise<GrpcWebFrame[]> {
     .then(message => decode(message))
 }
 
-export function decode(message: string): GrpcWebFrame[] {
+// Detect if content is base64 encoded or not. Decode if it is.
+function getMessageBytes(message: string) {
+  if (message.length === 0) {
+    return new Uint8Array(0)
+  }
+  // raw bytes received
+  if (message.charCodeAt(0) === 0) {
+    const result = new Uint8Array(message.length);
+    for (let i = 0; i < message.length; i++) {
+      result[i] = message.charCodeAt(i)
+    }
+    return result
+  }
+  // base64 encoded content received
   let padding = 0
   for (let i = 0; i < message.length; i++) {
     if (message[i] === '=') {
@@ -229,6 +242,11 @@ export function decode(message: string): GrpcWebFrame[] {
       bytes[pos++] = binaryString.charCodeAt(j)
     }
   }
+  return bytes
+}
+
+export function decode(message: string): GrpcWebFrame[] {
+  const bytes = getMessageBytes(message)
   const result = []
   for (let pos = 0; pos < bytes.length;) {
     const frameType = bytes[pos++] as GrpcWebFrameType

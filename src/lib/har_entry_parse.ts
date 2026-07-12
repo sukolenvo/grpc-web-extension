@@ -3,7 +3,10 @@ import {GrpcStatus, GrpcWebCall} from "./grpc_web_call";
 import {Header} from "har-format";
 
 export function isGrpcWebCall(entry: HAREntry): boolean {
-  return getHeader(entry.request.headers, "content-type") == "application/grpc-web-text" || getHeader(entry.request.headers, "content-type") == "application/grpc"
+  const contentType = getHeader(entry.request.headers, "content-type")
+  return contentType === "application/grpc-web-text"
+    || contentType === "application/grpc"
+    || contentType === "application/grpc-web+proto"
 }
 
 export const getHeader = (headers: Header[], header_name: string): string|undefined => {

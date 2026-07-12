@@ -54,6 +54,44 @@ test('non-printable', () => {
   )
 })
 
+test('raw-bytes', () => {
+  const grpcWebFrames = decode('\x00\x00\x00\x00C\x1a\x03EUR"\n\n\x080.950000*\n\n\x081.0400002\x0ewtmT_HL94ZP649:\x10xxxx.yyyyyyy.run@\x01H\x01')
+
+  expect(grpcWebFrames).toEqual([
+    {
+      type: GrpcWebFrameType.DATA,
+      message: [{
+        id: 3,
+        value: "EUR"
+      }, {
+        id: 4,
+        value: [{
+          id: 1,
+          value: "0.950000"
+        }]
+      }, {
+        id: 5,
+        value: [{
+          id: 1,
+          value: "1.040000"
+        }]
+      }, {
+        id: 6,
+        value: "wtmT_HL94ZP649"
+      }, {
+        id: 7,
+        value: "xxxx.yyyyyyy.run"
+      }, {
+        id: 8,
+        value: 1,
+      }, {
+        id: 9,
+        value: 1
+      }]
+    }]
+  )
+})
+
 test('multi-byte-tag', () => {
   const grpcWebFrames = decode("AAAAAASSAgE5")
 
